@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民泊運営AI - The One Capital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #ffffff;
+  --bg-sub: #f5f7fa;
+  --text: #1a1a2e;
+  --text-sub: #4a5568;
+  --accent: #1e3a5f;
+  --accent-light: #2d5a8e;
+  --success: #276749;
+  --success-bg: #f0fff4;
+  --warning: #975a16;
+  --warning-bg: #fffff0;
+  --error: #c53030;
+  --error-bg: #fff5f5;
+  --border: #e2e8f0;
+  --shadow: 0 4px 16px rgba(0,0,0,0.06);
+  --radius: 8px;
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg-sub);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* Sidebar */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--accent);
+  color: #fff;
+  padding: 24px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 16px;
+}
+
+.sidebar-logo h1 {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.sidebar-logo p {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.nav-section {
+  padding: 8px 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.5;
+  margin-top: 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+  border: none;
+  background: none;
+  color: #fff;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.nav-item:hover { background: rgba(255,255,255,0.1); }
+.nav-item.active { background: rgba(255,255,255,0.15); font-weight: 600; }
+
+.nav-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Main Content */
+.main {
+  margin-left: 260px;
+  flex: 1;
+  padding: 32px;
+  max-width: 1280px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.page-header h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.page-header .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--success-bg);
+  color: var(--success);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.page-header .badge::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Cards */
+.card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.card-header .sub {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+/* KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 24px;
+}
+
+.kpi-card .label {
+  font-size: 12px;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.kpi-card .value {
+  font-family: 'Inter', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.kpi-card .change {
+  font-size: 13px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kpi-card .change.up { color: var(--success); }
+.kpi-card .change.down { color: var(--error); }
+
+/* Table */
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  background: var(--bg-sub);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-sub);
+  font-size: 12px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+tbody tr:hover { background: var(--bg-sub); }
+
+.status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status.confirmed { background: var(--success-bg); color: var(--success); }
+.status.pending { background: var(--warning-bg); color: var(--warning); }
+.status.cancelled { background: var(--error-bg); color: var(--error); }
+.status.checkin { background: #ebf8ff; color: #2b6cb0; }
+
+/* Chart placeholder */
+.chart-area {
+  position: relative;
+  height: 280px;
+  background: var(--bg-sub);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 100%;
+  padding: 20px 16px;
+}
+
+.bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.bar {
+  width: 100%;
+  max-width: 40px;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.6s ease;
+}
+
+.bar.revenue { background: var(--accent); }
+.bar.expense { background: #cbd5e0; }
+.bar.profit { background: var(--success); }
+.bar.loss { background: var(--error); opacity: 0.7; }
+
+.bar-label {
+  font-size: 11px;
+  color: var(--text-sub);
+  font-weight: 500;
+}
+
+/* Occupancy bar */
+.occ-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.occ-bar {
+  flex: 1;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 120px;
+}
+
+.occ-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s;
+}
+
+.occ-value {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 40px;
+}
+
+/* Grid layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+/* Cleaning schedule */
+.schedule-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+
+.schedule-row:last-child { border-bottom: none; }
+
+.schedule-time {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 60px;
+  color: var(--accent);
+}
+
+.schedule-property {
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 140px;
+}
+
+.schedule-staff {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.staff-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-sub);
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+/* Utility cards */
+.utility-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  border-left: 4px solid var(--accent);
+}
+
+.utility-card .provider {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-bottom: 4px;
+}
+
+.utility-card .amount {
+  font-family: 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.utility-card .period {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-top: 4px;
+}
+
+.utility-card.electric { border-left-color: #d69e2e; }
+.utility-card.gas { border-left-color: #e53e3e; }
+.utility-card.water { border-left-color: #3182ce; }
+.utility-card.internet { border-left-color: #805ad5; }
+
+/* Automation status */
+.auto-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 8px 14px;
+  background: var(--bg-sub);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.auto-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.auto-dot.active { background: var(--success); animation: pulse 2s infinite; }
+.auto-dot.pending { background: #d69e2e; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+}
+
+.tab {
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-sub);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+/* Section visibility */
+.section { display: none; }
+.section.active { display: block; }
+
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-bar select, .filter-bar input {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-light); }
+.btn-outline { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+.btn-outline:hover { background: var(--bg-sub); }
+
+/* Investor report */
+.report-header {
+  text-align: center;
+  padding: 32px 0 24px;
+  border-bottom: 2px solid var(--accent);
+  margin-bottom: 24px;
+}
+
+.report-header h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.report-header p {
+  color: var(--text-sub);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.pl-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pl-row.total {
+  font-weight: 700;
+  border-bottom: 2px solid var(--text);
+  padding: 10px 0;
+}
+
+.pl-row.subtotal {
+  font-weight: 600;
+  background: var(--bg-sub);
+  padding: 8px 12px;
+  margin: 0 -12px;
+  border-radius: 4px;
+}
+
+.pl-row .amount {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+.pl-row .amount.negative { color: var(--error); }
+.pl-row .amount.positive { color: var(--success); }
+
+/* Donut chart */
+.donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.donut {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut-center {
+  position: absolute;
+  text-align: center;
+}
+
+.donut-center .val {
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.donut-center .lbl {
+  font-size: 11px;
+  color: var(--text-sub);
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 16px; }
+  .kpi-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <h1>民泊運営 AI</h1>
+      <p>The One Capital</p>
+    </div>
+    <div class="nav-section">メイン</div>
+    <button class="nav-item active" onclick="showSection('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      ダッシュボード
+    </button>
+    <button class="nav-item" onclick="showSection('reservations')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      予約管理
+    </button>
+    <button class="nav-item" onclick="showSection('sales')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      売上管理
+    </button>
+    <div class="nav-section">オペレーション</div>
+    <button class="nav-item" onclick="showSection('cleaning')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg>
+      清掃管理
+    </button>
+    <button class="nav-item" onclick="showSection('utilities')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      光熱費管理
+    </button>
+    <div class="nav-section">レポート</div>
+    <button class="nav-item" onclick="showSection('investor')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      投資家報告書
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- ========== DASHBOARD ========== -->
+    <div id="dashboard" class="section active">
+      <div class="page-header">
+        <h2>ダッシュボード</h2>
+        <span class="badge">AI自動取得中</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="label">月間総売上（3月）</div>
+          <div class="value">¥1,571,166</div>
+          <div class="change up">+37.5% 前月比</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">月間粗利</div>
+          <div class="value">¥422,987</div>
+          <div class="change up">+336.7% 前月比</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">平均稼働率</div>
+          <div class="value">100%</div>
+          <div class="change up">+0pt 前月比</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">管理物件数</div>
+          <div class="value">25室</div>
+          <div class="change" style="color:var(--text-sub)">9棟</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3>月別売上・粗利推移</h3>
+            <span class="sub">2026年</span>
+          </div>
+          <div class="chart-area">
+            <div class="bar-chart" id="monthlyChart"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>物件別稼働率（3月）</h3>
+            <span class="sub">全物件</span>
+          </div>
+          <div id="occupancyList" style="padding: 8px 0;"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>直近の予約</h3>
+          <span class="sub">最新10件</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>予約ID</th>
+                <th>物件</th>
+                <th>ゲスト名</th>
+                <th>チェックイン</th>
+                <th>チェックアウト</th>
+                <th>泊数</th>
+                <th>人数</th>
+                <th>売上</th>
+                <th>OTA</th>
+                <th>ステータス</th>
+              </tr>
+            </thead>
+            <tbody id="recentReservations"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== RESERVATIONS ========== -->
+    <div id="reservations" class="section">
+      <div class="page-header">
+        <h2>予約管理</h2>
+        <span class="badge">Beds24 連携中</span>
+      </div>
+
+      <div class="filter-bar">
+        <select id="propFilter">
+          <option value="">全物件</option>
+          <option value="NSV">西品川戸建て (NSV)</option>
+          <option value="ST201">戸越201号室</option>
+          <option value="ST205">戸越205号室</option>
+          <option value="ST206">戸越206号室</option>
+          <option value="GC102">GC102</option>
+          <option value="GC103">GC103</option>
+          <option value="GC105">GC105</option>
+          <option value="GC205">GC205</option>
+          <option value="GC206">GC206</option>
+          <option value="FY101">FY101</option>
+          <option value="FY201">FY201</option>
+          <option value="FY301">FY301</option>
+          <option value="CH101">CH101</option>
+          <option value="CH201">CH201</option>
+          <option value="CH301">CH301</option>
+        </select>
+        <select>
+          <option>2026年3月</option>
+          <option>2026年2月</option>
+          <option>2026年1月</option>
+        </select>
+        <select>
+          <option value="">全OTA</option>
+          <option>Airbnb</option>
+          <option>Booking.com</option>
+          <option>Agoda</option>
+        </select>
+        <button class="btn btn-outline">CSVエクスポート</button>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="label">月間予約数</div>
+          <div class="value">44組</div>
+          <div class="change up">+25.7% 前月比</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">平均宿泊日数</div>
+          <div class="value">2.1泊</div>
+          <div class="change down">-12.5% 前月比</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">平均宿泊人数</div>
+          <div class="value">2.7人</div>
+          <div class="change down">-10.0% 前月比</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">平均ADR</div>
+          <div class="value">¥13,572</div>
+          <div class="change up">+26.3% 前月比</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>予約一覧</h3>
+          <span class="sub">3月分 全44件</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>予約ID</th>
+                <th>物件</th>
+                <th>ゲスト名</th>
+                <th>チェックイン</th>
+                <th>チェックアウト</th>
+                <th>泊数</th>
+                <th>人数</th>
+                <th>売上</th>
+                <th>清掃費</th>
+                <th>OTA</th>
+                <th>ステータス</th>
+              </tr>
+            </thead>
+            <tbody id="allReservations"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SALES ========== -->
+    <div id="sales" class="section">
+      <div class="page-header">
+        <h2>売上管理</h2>
+        <span class="sub" style="color:var(--text-sub)">2026年度</span>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="showSalesTab('overview')">概要</button>
+        <button class="tab" onclick="showSalesTab('byProperty')">物件別</button>
+        <button class="tab" onclick="showSalesTab('monthly')">月別推移</button>
+      </div>
+
+      <div id="salesOverview" class="sales-tab">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="label">年間総売上（見込）</div>
+            <div class="value">¥6,471,508</div>
+            <div class="change" style="color:var(--text-sub)">1-3月実績</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">年間粗利（見込）</div>
+            <div class="value">¥557,815</div>
+            <div class="change" style="color:var(--text-sub)">1-3月実績</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">粗利率</div>
+            <div class="value">8.6%</div>
+            <div class="change up">改善傾向</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">平均稼働率</div>
+            <div class="value">99%</div>
+            <div class="change up">高水準維持</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>月別収支サマリー（3物件合計）</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th style="text-align:right">1月</th>
+                  <th style="text-align:right">2月</th>
+                  <th style="text-align:right">3月</th>
+                  <th style="text-align:right">4月</th>
+                  <th style="text-align:right">5月</th>
+                  <th style="text-align:right">6月</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>総売上</strong></td>
+                  <td style="text-align:right">¥1,058,994</td>
+                  <td style="text-align:right">¥1,142,413</td>
+                  <td style="text-align:right">¥1,571,166</td>
+                  <td style="text-align:right">¥1,104,865</td>
+                  <td style="text-align:right">¥876,580</td>
+                  <td style="text-align:right">¥222,877</td>
+                </tr>
+                <tr>
+                  <td>運営管理費(10%)</td>
+                  <td style="text-align:right; color:var(--error)">-¥105,899</td>
+                  <td style="text-align:right; color:var(--error)">-¥114,241</td>
+                  <td style="text-align:right; color:var(--error)">-¥157,117</td>
+                  <td style="text-align:right; color:var(--error)">-¥110,487</td>
+                  <td style="text-align:right; color:var(--error)">-¥87,658</td>
+                  <td style="text-align:right; color:var(--error)">-¥22,288</td>
+                </tr>
+                <tr>
+                  <td>家賃</td>
+                  <td style="text-align:right; color:var(--error)">-¥600,264</td>
+                  <td style="text-align:right; color:var(--error)">-¥600,264</td>
+                  <td style="text-align:right; color:var(--error)">-¥600,264</td>
+                  <td style="text-align:right; color:var(--error)">-¥600,264</td>
+                  <td style="text-align:right; color:var(--error)">-¥600,264</td>
+                  <td style="text-align:right; color:var(--error)">-¥600,264</td>
+                </tr>
+                <tr>
+                  <td>光熱費</td>
+                  <td style="text-align:right; color:var(--error)">-¥68,954</td>
+                  <td style="text-align:right; color:var(--error)">-¥70,023</td>
+                  <td style="text-align:right; color:var(--error)">-¥60,000</td>
+                  <td style="text-align:right; color:var(--error)">-¥60,000</td>
+                  <td style="text-align:right; color:var(--error)">-¥60,000</td>
+                  <td style="text-align:right; color:var(--error)">-¥60,000</td>
+                </tr>
+                <tr>
+                  <td>通信費</td>
+                  <td style="text-align:right; color:var(--error)">-¥14,098</td>
+                  <td style="text-align:right; color:var(--error)">-¥14,098</td>
+                  <td style="text-align:right; color:var(--error)">-¥14,098</td>
+                  <td style="text-align:right; color:var(--error)">-¥14,098</td>
+                  <td style="text-align:right; color:var(--error)">-¥14,098</td>
+                  <td style="text-align:right; color:var(--error)">-¥14,098</td>
+                </tr>
+                <tr>
+                  <td>消耗品</td>
+                  <td style="text-align:right; color:var(--error)">-¥2,810</td>
+                  <td style="text-align:right; color:var(--error)">-¥5,103</td>
+                  <td style="text-align:right; color:var(--error)">-¥15,600</td>
+                  <td style="text-align:right; color:var(--error)">-¥15,600</td>
+                  <td style="text-align:right; color:var(--error)">-¥15,600</td>
+                  <td style="text-align:right; color:var(--error)">-¥15,600</td>
+                </tr>
+                <tr>
+                  <td>清掃外注費</td>
+                  <td style="text-align:right; color:var(--error)">-¥202,510</td>
+                  <td style="text-align:right; color:var(--error)">-¥225,600</td>
+                  <td style="text-align:right; color:var(--error)">-¥289,800</td>
+                  <td style="text-align:right; color:var(--error)">-¥156,600</td>
+                  <td style="text-align:right; color:var(--error)">-¥85,500</td>
+                  <td style="text-align:right; color:var(--error)">-¥44,600</td>
+                </tr>
+                <tr>
+                  <td>ゴミ処理費用</td>
+                  <td style="text-align:right; color:var(--error)">-¥15,428</td>
+                  <td style="text-align:right; color:var(--error)">-¥13,926</td>
+                  <td style="text-align:right; color:var(--error)">-¥11,300</td>
+                  <td style="text-align:right; color:var(--error)">-¥11,300</td>
+                  <td style="text-align:right; color:var(--error)">-¥11,300</td>
+                  <td style="text-align:right; color:var(--error)">-¥11,300</td>
+                </tr>
+                <tr style="background:var(--bg-sub); font-weight:700">
+                  <td><strong>粗利</strong></td>
+                  <td style="text-align:right; color:var(--success)">¥37,966</td>
+                  <td style="text-align:right; color:var(--success)">¥96,862</td>
+                  <td style="text-align:right; color:var(--success)">¥422,987</td>
+                  <td style="text-align:right; color:var(--success)">¥136,517</td>
+                  <td style="text-align:right; color:var(--success)">¥2,160</td>
+                  <td style="text-align:right; color:var(--error)">-¥545,273</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="salesByProperty" class="sales-tab" style="display:none">
+        <div class="grid-3" id="propertyCards"></div>
+      </div>
+
+      <div id="salesMonthly" class="sales-tab" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <h3>売上・粗利推移チャート</h3>
+          </div>
+          <div class="chart-area">
+            <div class="bar-chart" id="salesChart"></div>
+          </div>
+          <div style="display:flex; gap:20px; justify-content:center; margin-top:12px">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>総売上</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--success)"></div>粗利（黒字）</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--error); opacity:0.7"></div>粗利（赤字）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CLEANING ========== -->
+    <div id="cleaning" class="section">
+      <div class="page-header">
+        <h2>清掃管理</h2>
+        <span class="badge">予約連動中</span>
+      </div>
+
+      <div class="filter-bar">
+        <select>
+          <option>2026年3月</option>
+          <option>2026年2月</option>
+          <option selected>2026年1月</option>
+        </select>
+        <button class="btn btn-primary">清掃スタッフに通知</button>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="label">月間清掃回数</div>
+          <div class="value">110回</div>
+          <div class="change" style="color:var(--text-sub)">1月実績</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">清掃スタッフ数</div>
+          <div class="value">6名</div>
+          <div class="change" style="color:var(--text-sub)">稼働中</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">清掃外注費合計</div>
+          <div class="value">¥202,510</div>
+          <div class="change down">-10.2% 前月比</div>
+        </div>
+        <div class="kpi-card">
+          <div class="label">1回あたり平均</div>
+          <div class="value">¥1,841</div>
+          <div class="change" style="color:var(--text-sub)">外注費ベース</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3>本日の清掃スケジュール</h3>
+            <span class="sub">3月20日（木）</span>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-time">10:00</div>
+            <div class="schedule-property">NSV 西品川戸建て</div>
+            <div class="schedule-staff"><span class="staff-badge">今野</span></div>
+            <div class="status confirmed">完了</div>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-time">10:00</div>
+            <div class="schedule-property">ST201 戸越201号室</div>
+            <div class="schedule-staff"><span class="staff-badge">須田</span></div>
+            <div class="status confirmed">完了</div>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-time">11:00</div>
+            <div class="schedule-property">GC205</div>
+            <div class="schedule-staff"><span class="staff-badge">今</span></div>
+            <div class="status checkin">作業中</div>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-time">13:00</div>
+            <div class="schedule-property">FY101</div>
+            <div class="schedule-staff"><span class="staff-badge">Lay</span></div>
+            <div class="status pending">予定</div>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-time">14:00</div>
+            <div class="schedule-property">CH201</div>
+            <div class="schedule-staff"><span class="staff-badge">Nandar</span></div>
+            <div class="status pending">予定</div>
+          </div>
+          <div class="schedule-row">
+            <div class="schedule-time">15:00</div>
+            <div class="schedule-property">GC102</div>
+            <div class="schedule-staff"><span class="staff-badge">ミキオ</span></div>
+            <div class="status pending">予定</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>スタッフ別稼働状況</h3>
+            <span class="sub">1月実績</span>
+          </div>
+          <div id="staffStats"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>月間清掃カレンダー</h3>
+          <span class="sub">1月</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>日付</th>
+                <th>NSV</th>
+                <th>ST201</th>
+                <th>ST205</th>
+                <th>GC205</th>
+                <th>GC102</th>
+                <th>FY101</th>
+                <th>CH201</th>
+                <th>清掃人数</th>
+              </tr>
+            </thead>
+            <tbody id="cleaningCalendar"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== UTILITIES ========== -->
+    <div id="utilities" class="section">
+      <div class="page-header">
+        <h2>光熱費管理</h2>
+        <span class="badge">自動取得中</span>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header">
+          <h3>データ自動取得ステータス</h3>
+        </div>
+        <div class="auto-status">
+          <div class="auto-dot active"></div>
+          <strong>TEPCO（電気）</strong>
+          <span style="color:var(--text-sub); margin-left:auto">最終取得: 2026-03-20 06:00 | 次回: 2026-03-21 06:00</span>
+        </div>
+        <div class="auto-status">
+          <div class="auto-dot active"></div>
+          <strong>東京ガス</strong>
+          <span style="color:var(--text-sub); margin-left:auto">最終取得: 2026-03-20 06:00 | 次回: 2026-03-21 06:00</span>
+        </div>
+        <div class="auto-status">
+          <div class="auto-dot active"></div>
+          <strong>東京都水道局</strong>
+          <span style="color:var(--text-sub); margin-left:auto">最終取得: 2026-03-15 06:00 | 次回: 2026-04-15 06:00</span>
+        </div>
+        <div class="auto-status">
+          <div class="auto-dot active"></div>
+          <strong>BIGLOBE Biz（通信）</strong>
+          <span style="color:var(--text-sub); margin-left:auto">最終取得: 2026-03-20 06:00 | 次回: 2026-03-21 06:00</span>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-left: 4px solid #d69e2e">
+          <div class="label">電気代（全物件）</div>
+          <div class="value">¥39,459</div>
+          <div class="change down">+5.2% 前月比</div>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #e53e3e">
+          <div class="label">ガス代（全物件）</div>
+          <div class="value">¥15,480</div>
+          <div class="change up">-8.1% 前月比</div>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #3182ce">
+          <div class="label">水道代（全物件）</div>
+          <div class="value">¥14,015</div>
+          <div class="change" style="color:var(--text-sub)">隔月請求</div>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #805ad5">
+          <div class="label">通信費（全物件）</div>
+          <div class="value">¥14,098</div>
+          <div class="change" style="color:var(--text-sub)">定額</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3>物件別光熱費内訳（1月）</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>物件</th>
+                  <th style="text-align:right">電気</th>
+                  <th style="text-align:right">ガス</th>
+                  <th style="text-align:right">水道</th>
+                  <th style="text-align:right">通信</th>
+                  <th style="text-align:right">合計</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>西品川戸建て</td>
+                  <td style="text-align:right">¥22,134</td>
+                  <td style="text-align:right">¥8,512</td>
+                  <td style="text-align:right">¥8,813</td>
+                  <td style="text-align:right">¥5,918</td>
+                  <td style="text-align:right"><strong>¥45,377</strong></td>
+                </tr>
+                <tr>
+                  <td>戸越201号室</td>
+                  <td style="text-align:right">¥9,248</td>
+                  <td style="text-align:right">¥3,712</td>
+                  <td style="text-align:right">¥3,020</td>
+                  <td style="text-align:right">¥4,180</td>
+                  <td style="text-align:right"><strong>¥20,160</strong></td>
+                </tr>
+                <tr>
+                  <td>戸越205号室</td>
+                  <td style="text-align:right">¥8,077</td>
+                  <td style="text-align:right">¥3,256</td>
+                  <td style="text-align:right">¥2,182</td>
+                  <td style="text-align:right">¥4,000</td>
+                  <td style="text-align:right"><strong>¥17,515</strong></td>
+                </tr>
+                <tr style="background:var(--bg-sub); font-weight:700">
+                  <td><strong>合計</strong></td>
+                  <td style="text-align:right">¥39,459</td>
+                  <td style="text-align:right">¥15,480</td>
+                  <td style="text-align:right">¥14,015</td>
+                  <td style="text-align:right">¥14,098</td>
+                  <td style="text-align:right"><strong>¥83,052</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>光熱費推移</h3>
+            <span class="sub">全物件トータル</span>
+          </div>
+          <div class="chart-area">
+            <div class="bar-chart" id="utilityChart"></div>
+          </div>
+          <div style="display:flex; gap:16px; justify-content:center; margin-top:12px">
+            <div class="legend-item"><div class="legend-dot" style="background:#d69e2e"></div>電気</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#e53e3e"></div>ガス</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#3182ce"></div>水道</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>手動経費入力</h3>
+          <span class="sub">更新料・保険料など不定期経費</span>
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end">
+          <div>
+            <label style="font-size:12px; color:var(--text-sub); display:block; margin-bottom:4px">物件</label>
+            <select style="padding:8px 14px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:inherit">
+              <option>西品川戸建て</option>
+              <option>戸越201号室</option>
+              <option>戸越205号室</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px; color:var(--text-sub); display:block; margin-bottom:4px">費目</label>
+            <select style="padding:8px 14px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:inherit">
+              <option>更新料</option>
+              <option>保険料</option>
+              <option>修繕費</option>
+              <option>その他</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px; color:var(--text-sub); display:block; margin-bottom:4px">金額</label>
+            <input type="text" placeholder="¥0" style="padding:8px 14px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:inherit; width:140px">
+          </div>
+          <div>
+            <label style="font-size:12px; color:var(--text-sub); display:block; margin-bottom:4px">対象月</label>
+            <input type="month" value="2026-03" style="padding:8px 14px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:inherit">
+          </div>
+          <button class="btn btn-primary">登録</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== INVESTOR REPORT ========== -->
+    <div id="investor" class="section">
+      <div class="page-header">
+        <h2>投資家報告書</h2>
+        <div style="display:flex; gap:8px">
+          <button class="btn btn-outline">PDFエクスポート</button>
+          <button class="btn btn-primary">レポート送信</button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <select id="investorMonth">
+          <option value="3">2026年3月</option>
+          <option value="2">2026年2月</option>
+          <option value="1" selected>2026年1月</option>
+        </select>
+        <select>
+          <option>全物件</option>
+          <option>西品川戸建て</option>
+          <option>戸越201号室</option>
+          <option>戸越205号室</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="report-header">
+          <h3>月次運営報告書</h3>
+          <p>The One Capital 民泊運営 | 2026年1月度</p>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:24px">
+          <div>
+            <h4 style="font-size:14px; margin-bottom:12px; color:var(--accent)">収益サマリー</h4>
+            <div class="donut-wrap">
+              <div class="donut" style="background: conic-gradient(var(--accent) 0% 56%, #cbd5e0 56% 75%, var(--error) 75% 100%);">
+                <div class="donut-center">
+                  <div class="val">¥1.06M</div>
+                  <div class="lbl">総売上</div>
+                </div>
+              </div>
+              <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>家賃 ¥600,264 (56%)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#cbd5e0"></div>運営費 ¥195,300 (19%)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--error)"></div>清掃費 ¥202,510 (19%)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--success)"></div>粗利 ¥37,966 (4%)</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 style="font-size:14px; margin-bottom:12px; color:var(--accent)">稼働KPI</h4>
+            <div style="padding:8px 0">
+              <div class="pl-row"><span>平均稼働率</span><span class="amount positive">96%</span></div>
+              <div class="pl-row"><span>総予約日数</span><span class="amount">89日 / 93日</span></div>
+              <div class="pl-row"><span>総予約組数</span><span class="amount">39組</span></div>
+              <div class="pl-row"><span>総宿泊人数</span><span class="amount">110人</span></div>
+              <div class="pl-row"><span>平均ADR</span><span class="amount">¥8,974</span></div>
+              <div class="pl-row"><span>平均宿泊日数</span><span class="amount">2.3泊</span></div>
+              <div class="pl-row"><span>平均宿泊人数</span><span class="amount">2.8人</span></div>
+            </div>
+          </div>
+        </div>
+
+        <h4 style="font-size:14px; margin-bottom:12px; color:var(--accent)">物件別損益計算書</h4>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>項目</th>
+                <th style="text-align:right">西品川戸建て</th>
+                <th style="text-align:right">戸越201号室</th>
+                <th style="text-align:right">戸越205号室</th>
+                <th style="text-align:right">合計</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>部屋売上</strong></td>
+                <td style="text-align:right">¥337,475</td>
+                <td style="text-align:right">¥253,122</td>
+                <td style="text-align:right">¥205,397</td>
+                <td style="text-align:right"><strong>¥795,994</strong></td>
+              </tr>
+              <tr>
+                <td>清掃費</td>
+                <td style="text-align:right">¥120,000</td>
+                <td style="text-align:right">¥88,000</td>
+                <td style="text-align:right">¥55,000</td>
+                <td style="text-align:right">¥263,000</td>
+              </tr>
+              <tr style="background:var(--bg-sub)">
+                <td><strong>総売上</strong></td>
+                <td style="text-align:right"><strong>¥457,475</strong></td>
+                <td style="text-align:right"><strong>¥341,122</strong></td>
+                <td style="text-align:right"><strong>¥260,397</strong></td>
+                <td style="text-align:right"><strong>¥1,058,994</strong></td>
+              </tr>
+              <tr>
+                <td>運営管理費(10%)</td>
+                <td style="text-align:right; color:var(--error)">-¥45,748</td>
+                <td style="text-align:right; color:var(--error)">-¥34,112</td>
+                <td style="text-align:right; color:var(--error)">-¥26,040</td>
+                <td style="text-align:right; color:var(--error)">-¥105,899</td>
+              </tr>
+              <tr>
+                <td>家賃</td>
+                <td style="text-align:right; color:var(--error)">-¥350,330</td>
+                <td style="text-align:right; color:var(--error)">-¥138,717</td>
+                <td style="text-align:right; color:var(--error)">-¥111,217</td>
+                <td style="text-align:right; color:var(--error)">-¥600,264</td>
+              </tr>
+              <tr>
+                <td>光熱費</td>
+                <td style="text-align:right; color:var(--error)">-¥39,459</td>
+                <td style="text-align:right; color:var(--error)">-¥15,980</td>
+                <td style="text-align:right; color:var(--error)">-¥13,515</td>
+                <td style="text-align:right; color:var(--error)">-¥68,954</td>
+              </tr>
+              <tr>
+                <td>通信費</td>
+                <td style="text-align:right; color:var(--error)">-¥5,918</td>
+                <td style="text-align:right; color:var(--error)">-¥4,180</td>
+                <td style="text-align:right; color:var(--error)">-¥4,000</td>
+                <td style="text-align:right; color:var(--error)">-¥14,098</td>
+              </tr>
+              <tr>
+                <td>消耗品</td>
+                <td style="text-align:right; color:var(--error)">-¥4,625</td>
+                <td style="text-align:right; color:var(--error)">-¥4,625</td>
+                <td style="text-align:right; color:var(--error)">-¥4,625</td>
+                <td style="text-align:right; color:var(--error)">-¥2,810</td>
+              </tr>
+              <tr>
+                <td>清掃外注費</td>
+                <td style="text-align:right; color:var(--error)">-¥92,400</td>
+                <td style="text-align:right; color:var(--error)">-¥67,760</td>
+                <td style="text-align:right; color:var(--error)">-¥42,350</td>
+                <td style="text-align:right; color:var(--error)">-¥202,510</td>
+              </tr>
+              <tr>
+                <td>ゴミ処理費用</td>
+                <td style="text-align:right; color:var(--error)">-¥3,300</td>
+                <td style="text-align:right; color:var(--error)">-¥6,064</td>
+                <td style="text-align:right; color:var(--error)">-¥6,064</td>
+                <td style="text-align:right; color:var(--error)">-¥15,428</td>
+              </tr>
+              <tr style="background:var(--bg-sub); font-weight:700; font-size:14px">
+                <td><strong>粗利（売上総利益）</strong></td>
+                <td style="text-align:right; color:var(--error)">-¥84,305</td>
+                <td style="text-align:right; color:var(--success)">¥69,684</td>
+                <td style="text-align:right; color:var(--success)">¥52,586</td>
+                <td style="text-align:right; color:var(--success)"><strong>¥37,966</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:24px">
+          <h4 style="font-size:14px; margin-bottom:12px; color:var(--accent)">物件別KPI</h4>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>指標</th>
+                  <th style="text-align:right">西品川戸建て</th>
+                  <th style="text-align:right">戸越201号室</th>
+                  <th style="text-align:right">戸越205号室</th>
+                  <th style="text-align:right">平均</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>稼働率</td>
+                  <td style="text-align:right">94%</td>
+                  <td style="text-align:right">97%</td>
+                  <td style="text-align:right">97%</td>
+                  <td style="text-align:right"><strong>96%</strong></td>
+                </tr>
+                <tr>
+                  <td>予約日数</td>
+                  <td style="text-align:right">29日</td>
+                  <td style="text-align:right">30日</td>
+                  <td style="text-align:right">30日</td>
+                  <td style="text-align:right"><strong>29.7日</strong></td>
+                </tr>
+                <tr>
+                  <td>予約組数</td>
+                  <td style="text-align:right">12組</td>
+                  <td style="text-align:right">16組</td>
+                  <td style="text-align:right">11組</td>
+                  <td style="text-align:right"><strong>13.0組</strong></td>
+                </tr>
+                <tr>
+                  <td>宿泊人数</td>
+                  <td style="text-align:right">57人</td>
+                  <td style="text-align:right">32人</td>
+                  <td style="text-align:right">21人</td>
+                  <td style="text-align:right"><strong>36.7人</strong></td>
+                </tr>
+                <tr>
+                  <td>ADR</td>
+                  <td style="text-align:right">¥11,637</td>
+                  <td style="text-align:right">¥8,437</td>
+                  <td style="text-align:right">¥6,847</td>
+                  <td style="text-align:right"><strong>¥8,974</strong></td>
+                </tr>
+                <tr>
+                  <td>組単価</td>
+                  <td style="text-align:right">¥28,123</td>
+                  <td style="text-align:right">¥15,820</td>
+                  <td style="text-align:right">¥18,672</td>
+                  <td style="text-align:right"><strong>¥20,872</strong></td>
+                </tr>
+                <tr>
+                  <td>平均宿泊人数</td>
+                  <td style="text-align:right">4.8人</td>
+                  <td style="text-align:right">2.0人</td>
+                  <td style="text-align:right">1.9人</td>
+                  <td style="text-align:right"><strong>2.9人</strong></td>
+                </tr>
+                <tr>
+                  <td>平均宿泊日数</td>
+                  <td style="text-align:right">2.4泊</td>
+                  <td style="text-align:right">1.9泊</td>
+                  <td style="text-align:right">2.7泊</td>
+                  <td style="text-align:right"><strong>2.3泊</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// Navigation
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// Sales tabs
+function showSalesTab(tab) {
+  document.querySelectorAll('.sales-tab').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  if (tab === 'overview') document.getElementById('salesOverview').style.display = 'block';
+  if (tab === 'byProperty') document.getElementById('salesByProperty').style.display = 'block';
+  if (tab === 'monthly') document.getElementById('salesMonthly').style.display = 'block';
+}
+
+// Data
+const monthlyData = [
+  { month: '1月', revenue: 1058994, profit: 37966 },
+  { month: '2月', revenue: 1142413, profit: 96862 },
+  { month: '3月', revenue: 1571166, profit: 422987 },
+  { month: '4月', revenue: 1104865, profit: 136517 },
+  { month: '5月', revenue: 876580, profit: 2160 },
+  { month: '6月', revenue: 222877, profit: -545273 },
+  { month: '7月', revenue: 190363, profit: -573935 },
+  { month: '8月', revenue: 130574, profit: -594245 },
+  { month: '9月', revenue: 403847, profit: -346600 },
+  { month: '10月', revenue: 429784, profit: -333756 },
+  { month: '11月', revenue: 340045, profit: -410722 },
+];
+
+const occupancyData = [
+  { name: '西品川戸建て', rate: 100 },
+  { name: '戸越201号室', rate: 100 },
+  { name: '戸越205号室', rate: 100 },
+  { name: 'GC205', rate: 87 },
+  { name: 'GC102', rate: 74 },
+  { name: 'GC206', rate: 68 },
+  { name: 'FY101', rate: 81 },
+  { name: 'FY201', rate: 77 },
+  { name: 'CH201', rate: 65 },
+  { name: 'ST206', rate: 58 },
+];
+
+const reservations = [
+  { id: 'BK-2603-001', prop: 'NSV', guest: 'Tanaka Y.', cin: '2026-03-01', cout: '2026-03-04', nights: 3, pax: 5, amount: 58632, ota: 'Airbnb', status: 'confirmed' },
+  { id: 'BK-2603-002', prop: 'ST201', guest: 'Kim S.', cin: '2026-03-01', cout: '2026-03-03', nights: 2, pax: 2, amount: 18240, ota: 'Booking.com', status: 'confirmed' },
+  { id: 'BK-2603-003', prop: 'ST205', guest: 'Smith J.', cin: '2026-03-02', cout: '2026-03-05', nights: 3, pax: 2, amount: 37893, ota: 'Airbnb', status: 'confirmed' },
+  { id: 'BK-2603-004', prop: 'GC205', guest: 'Yamada K.', cin: '2026-03-03', cout: '2026-03-05', nights: 2, pax: 3, amount: 22480, ota: 'Agoda', status: 'confirmed' },
+  { id: 'BK-2603-005', prop: 'NSV', guest: 'Lee M.', cin: '2026-03-05', cout: '2026-03-08', nights: 3, pax: 6, amount: 65340, ota: 'Airbnb', status: 'confirmed' },
+  { id: 'BK-2603-006', prop: 'FY101', guest: 'Suzuki A.', cin: '2026-03-06', cout: '2026-03-08', nights: 2, pax: 2, amount: 15800, ota: 'Booking.com', status: 'confirmed' },
+  { id: 'BK-2603-007', prop: 'CH201', guest: 'Wang L.', cin: '2026-03-08', cout: '2026-03-10', nights: 2, pax: 2, amount: 14200, ota: 'Agoda', status: 'confirmed' },
+  { id: 'BK-2603-008', prop: 'GC102', guest: 'Johnson R.', cin: '2026-03-10', cout: '2026-03-13', nights: 3, pax: 2, amount: 28500, ota: 'Airbnb', status: 'confirmed' },
+  { id: 'BK-2603-009', prop: 'NSV', guest: 'Sato H.', cin: '2026-03-18', cout: '2026-03-22', nights: 4, pax: 4, amount: 78232, ota: 'Booking.com', status: 'checkin' },
+  { id: 'BK-2603-010', prop: 'ST201', guest: 'Park J.', cin: '2026-03-20', cout: '2026-03-23', nights: 3, pax: 2, amount: 25710, ota: 'Airbnb', status: 'checkin' },
+  { id: 'BK-2603-011', prop: 'GC205', guest: 'Chen W.', cin: '2026-03-22', cout: '2026-03-25', nights: 3, pax: 3, amount: 33600, ota: 'Agoda', status: 'pending' },
+  { id: 'BK-2603-012', prop: 'FY201', guest: 'Nakamura T.', cin: '2026-03-24', cout: '2026-03-26', nights: 2, pax: 2, amount: 18400, ota: 'Booking.com', status: 'pending' },
+  { id: 'BK-2603-013', prop: 'NSV', guest: 'Garcia M.', cin: '2026-03-25', cout: '2026-03-29', nights: 4, pax: 5, amount: 82100, ota: 'Airbnb', status: 'pending' },
+  { id: 'BK-2603-014', prop: 'CH101', guest: 'Ito K.', cin: '2026-03-26', cout: '2026-03-28', nights: 2, pax: 1, amount: 12300, ota: 'Booking.com', status: 'pending' },
+  { id: 'BK-2603-015', prop: 'ST205', guest: 'Brown A.', cin: '2026-03-28', cout: '2026-03-31', nights: 3, pax: 2, amount: 35100, ota: 'Airbnb', status: 'pending' },
+];
+
+const staffData = [
+  { name: '今野', count: 29, color: 'var(--accent)' },
+  { name: '須田', count: 24, color: 'var(--accent-light)' },
+  { name: '今', count: 21, color: '#4a90d9' },
+  { name: 'Lay', count: 13, color: '#6fb3b8' },
+  { name: 'ミキオ', count: 12, color: '#76c893' },
+  { name: 'Nandar', count: 11, color: '#95d5b2' },
+];
+
+// Render monthly chart
+function renderMonthlyChart() {
+  const container = document.getElementById('monthlyChart');
+  const maxRev = Math.max(...monthlyData.map(d => d.revenue));
+  container.innerHTML = monthlyData.map(d => {
+    const revH = (d.revenue / maxRev * 200);
+    const profitH = Math.abs(d.profit) / maxRev * 200;
+    const profitClass = d.profit >= 0 ? 'profit' : 'loss';
+    return `<div class="bar-group">
+      <div class="bar revenue" style="height:${revH}px" title="売上: ¥${d.revenue.toLocaleString()}"></div>
+      <div class="bar ${profitClass}" style="height:${profitH}px" title="粗利: ¥${d.profit.toLocaleString()}"></div>
+      <div class="bar-label">${d.month}</div>
+    </div>`;
+  }).join('');
+}
+
+// Render occupancy list
+function renderOccupancy() {
+  const container = document.getElementById('occupancyList');
+  container.innerHTML = occupancyData.map(d => {
+    const color = d.rate >= 80 ? 'var(--success)' : d.rate >= 50 ? 'var(--warning)' : 'var(--error)';
+    return `<div style="display:flex; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); gap:12px">
+      <span style="min-width:130px; font-size:13px; font-weight:500">${d.name}</span>
+      <div class="occ-bar-wrap" style="flex:1">
+        <div class="occ-bar"><div class="occ-bar-fill" style="width:${d.rate}%; background:${color}"></div></div>
+        <span class="occ-value" style="color:${color}">${d.rate}%</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Render reservations
+function renderReservations(containerId, limit) {
+  const container = document.getElementById(containerId);
+  const data = limit ? reservations.slice(0, limit) : reservations;
+  const statusLabels = { confirmed: '確定', pending: '予定', checkin: '滞在中', cancelled: 'キャンセル' };
+  container.innerHTML = data.map(r => `<tr>
+    <td style="font-family:Inter; font-weight:500">${r.id}</td>
+    <td>${r.prop}</td>
+    <td>${r.guest}</td>
+    <td>${r.cin}</td>
+    <td>${r.cout}</td>
+    <td style="text-align:center">${r.nights}泊</td>
+    <td style="text-align:center">${r.pax}人</td>
+    <td style="font-family:Inter; font-weight:600">¥${r.amount.toLocaleString()}</td>
+    <td>${r.ota}</td>
+    <td><span class="status ${r.status}">${statusLabels[r.status]}</span></td>
+  </tr>`).join('');
+}
+
+// Render staff stats
+function renderStaffStats() {
+  const container = document.getElementById('staffStats');
+  const maxCount = Math.max(...staffData.map(s => s.count));
+  container.innerHTML = staffData.map(s => `<div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border)">
+    <span style="min-width:60px; font-weight:500; font-size:14px">${s.name}</span>
+    <div style="flex:1; height:24px; background:#e2e8f0; border-radius:4px; overflow:hidden">
+      <div style="height:100%; width:${s.count/maxCount*100}%; background:${s.color}; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; color:#fff; font-size:12px; font-weight:600">${s.count}回</div>
+    </div>
+  </div>`).join('');
+}
+
+// Render cleaning calendar
+function renderCleaningCalendar() {
+  const container = document.getElementById('cleaningCalendar');
+  const staff = ['今野','須田','今','ミキオ','Lay','Nandar'];
+  const rows = [];
+  for (let d = 1; d <= 15; d++) {
+    const cells = [];
+    const props = ['NSV','ST201','ST205','GC205','GC102','FY101','CH201'];
+    let total = 0;
+    props.forEach(() => {
+      const hasClean = Math.random() > 0.4;
+      if (hasClean) {
+        total++;
+        cells.push(`<td><span class="staff-badge">${staff[Math.floor(Math.random()*staff.length)]}</span></td>`);
+      } else {
+        cells.push('<td style="color:#cbd5e0">-</td>');
+      }
+    });
+    rows.push(`<tr><td style="font-family:Inter; font-weight:500">1/${d}</td>${cells.join('')}<td style="text-align:center; font-weight:600">${total}名</td></tr>`);
+  }
+  container.innerHTML = rows.join('');
+}
+
+// Render sales chart
+function renderSalesChart() {
+  const container = document.getElementById('salesChart');
+  const maxRev = Math.max(...monthlyData.map(d => d.revenue));
+  container.innerHTML = monthlyData.map(d => {
+    const h = d.revenue / maxRev * 220;
+    return `<div class="bar-group">
+      <div class="bar revenue" style="height:${h}px"></div>
+      <div class="bar-label">${d.month}</div>
+    </div>`;
+  }).join('');
+}
+
+// Render property cards
+function renderPropertyCards() {
+  const props = [
+    { name: '西品川戸建て', revenue: 457475, profit: -84305, occ: '94%', adr: '¥11,637' },
+    { name: '戸越201号室', revenue: 341122, profit: 69684, occ: '97%', adr: '¥8,437' },
+    { name: '戸越205号室', revenue: 260397, profit: 52586, occ: '97%', adr: '¥6,847' },
+  ];
+  document.getElementById('propertyCards').innerHTML = props.map(p => `<div class="card">
+    <h3 style="font-size:16px; margin-bottom:16px">${p.name}</h3>
+    <div class="pl-row"><span>総売上</span><span class="amount">¥${p.revenue.toLocaleString()}</span></div>
+    <div class="pl-row"><span>粗利</span><span class="amount ${p.profit >= 0 ? 'positive' : 'negative'}">¥${p.profit.toLocaleString()}</span></div>
+    <div class="pl-row"><span>稼働率</span><span class="amount">${p.occ}</span></div>
+    <div class="pl-row"><span>ADR</span><span class="amount">${p.adr}</span></div>
+  </div>`).join('');
+}
+
+// Render utility chart
+function renderUtilityChart() {
+  const data = [
+    { month: '1月', elec: 39459, gas: 15480, water: 14015 },
+    { month: '2月', elec: 42811, gas: 14200, water: 13012 },
+    { month: '3月', elec: 36000, gas: 12000, water: 12000 },
+    { month: '4月', elec: 36000, gas: 12000, water: 12000 },
+    { month: '5月', elec: 36000, gas: 12000, water: 12000 },
+    { month: '6月', elec: 36000, gas: 12000, water: 12000 },
+  ];
+  const maxVal = 45000;
+  document.getElementById('utilityChart').innerHTML = data.map(d => `<div class="bar-group" style="display:flex; flex-direction:column; gap:2px; align-items:center">
+    <div style="display:flex; gap:3px; align-items:flex-end; height:220px">
+      <div style="width:14px; height:${d.elec/maxVal*200}px; background:#d69e2e; border-radius:2px 2px 0 0"></div>
+      <div style="width:14px; height:${d.gas/maxVal*200}px; background:#e53e3e; border-radius:2px 2px 0 0"></div>
+      <div style="width:14px; height:${d.water/maxVal*200}px; background:#3182ce; border-radius:2px 2px 0 0"></div>
+    </div>
+    <div class="bar-label">${d.month}</div>
+  </div>`).join('');
+}
+
+// Init
+renderMonthlyChart();
+renderOccupancy();
+renderReservations('recentReservations', 10);
+renderReservations('allReservations');
+renderStaffStats();
+renderCleaningCalendar();
+renderSalesChart();
+renderPropertyCards();
+renderUtilityChart();
+</script>
+
+</body>
+</html>
